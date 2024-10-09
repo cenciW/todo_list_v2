@@ -19,44 +19,108 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+  final _todoController = TextEditingController();
+
   //list of todos
   List _todoList = [];
 
   @override
+  void initState() {
+    super.initState();
+    _readData().then((data) {
+      setState(() {
+        _todoList = json.decode(data);
+      });
+    });
+  }
+
+  void _addTodo() {
+    setState(() {
+      Map<String, dynamic> newTodo = Map();
+      newTodo["title"] = _todoController.text;
+      _todoController.text = "";
+      newTodo["ok"] = false;
+      _todoList.add(newTodo);
+      _saveData();
+      // _getFile();
+    });
+  }
+
+  void _removeTodo(int index) {
+    setState(() {
+      _todoList.removeAt(index);
+      _saveData();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: const Text('Lista de Tarefas',
-              style: TextStyle(color: Colors.white)),
-          backgroundColor: Colors.blueAccent,
-          centerTitle: true,
-        ),
-        body: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.fromLTRB(17, 1, 7, 1),
-              child: Row(children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    decoration: InputDecoration(
-                      labelText: 'Nova Tarefa',
-                      labelStyle: TextStyle(color: Colors.blueAccent),
-                    ),
+      appBar: AppBar(
+        title: const Text('Lista de Tarefas',
+            style: TextStyle(color: Colors.white)),
+        backgroundColor: Colors.blueAccent,
+        centerTitle: true,
+      ),
+      body: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.fromLTRB(17, 1, 7, 1),
+            child: Row(children: <Widget>[
+              Expanded(
+                child: TextField(
+                  controller: _todoController,
+                  decoration: InputDecoration(
+                    labelText: 'Nova Tarefa',
+                    labelStyle: TextStyle(color: Colors.blueAccent),
                   ),
                 ),
-                ElevatedButton(
-                  onPressed: () {},
-                  child: Text(
-                    'ADD',
-                    style: TextStyle(color: Colors.white),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _addTodo();
+                  print("Adicionado");
+                },
+                child: Text(
+                  'ADD',
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blueAccent),
+              )
+            ]),
+          ),
+          Expanded(
+            child: ListView.builder(
+              padding: EdgeInsets.only(top: 10),
+              itemCount: _todoList.length,
+              itemBuilder: (contex, index) {
+                return CheckboxListTile(
+                  title: Text(_todoList[index]["title"]),
+                  value: _todoList[index]["ok"],
+                  secondary: IconButton(
+                    icon: Icon(_todoList[index]["ok"]
+                        ? Icons.check_circle
+                        : Icons.error),
+                    onPressed: () {
+                      setState(() {
+                        _todoList.removeAt(index);
+                      });
+                    },
                   ),
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent),
-                )
-              ]),
+                  onChanged: (bool? value) {
+                    setState(() {
+                      _todoList[index]["ok"] = value;
+                      _saveData();
+                    });
+                  },
+                );
+              },
             ),
-          ],
-        ));
+          )
+        ],
+      ),
+    );
   }
 
   Future<File> _getFile() async {
