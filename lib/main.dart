@@ -92,33 +92,43 @@ class _HomeState extends State<Home> {
           ),
           Expanded(
             child: ListView.builder(
-              padding: EdgeInsets.only(top: 10),
-              itemCount: _todoList.length,
-              itemBuilder: (contex, index) {
-                return CheckboxListTile(
-                  title: Text(_todoList[index]["title"]),
-                  value: _todoList[index]["ok"],
-                  secondary: IconButton(
-                    icon: Icon(_todoList[index]["ok"]
-                        ? Icons.check_circle
-                        : Icons.error),
-                    onPressed: () {
-                      setState(() {
-                        _todoList.removeAt(index);
-                      });
-                    },
-                  ),
-                  onChanged: (bool? value) {
-                    setState(() {
-                      _todoList[index]["ok"] = value;
-                      _saveData();
-                    });
-                  },
-                );
-              },
-            ),
+                padding: EdgeInsets.only(top: 10),
+                itemCount: _todoList.length,
+                itemBuilder: buildItem),
           )
         ],
+      ),
+    );
+  }
+
+  Widget buildItem(contex, index) {
+    return Dismissible(
+      key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
+      background: Container(
+        color: Colors.red,
+        child: Align(
+            alignment: Alignment(-0.9, 0.0),
+            child: Icon(Icons.delete, color: Colors.white)),
+      ),
+      direction: DismissDirection.startToEnd,
+      child: CheckboxListTile(
+        title: Text(_todoList[index]["title"]),
+        value: _todoList[index]["ok"],
+        secondary: IconButton(
+          icon: Icon(_todoList[index]["ok"] ? Icons.check_circle : Icons.error),
+          onPressed: () {
+            setState(() {
+              _todoList.removeAt(index);
+              _saveData();
+            });
+          },
+        ),
+        onChanged: (bool? value) {
+          setState(() {
+            _todoList[index]["ok"] = value;
+            _saveData();
+          });
+        },
       ),
     );
   }
