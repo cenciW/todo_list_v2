@@ -6,6 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 void main() {
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     home: Home(),
   ));
 }
@@ -24,23 +25,38 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Lista de Tarefas'),
-        backgroundColor: Colors.blue,
-      ),
-      body: Container(
-        color: Colors.white,
-        child: const Center(
-          child: Text(
-            'Conteúdo',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-            ),
-          ),
+        appBar: AppBar(
+          title: const Text('Lista de Tarefas',
+              style: TextStyle(color: Colors.white)),
+          backgroundColor: Colors.blueAccent,
+          centerTitle: true,
         ),
-      ),
-    );
+        body: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.fromLTRB(17, 1, 7, 1),
+              child: Row(children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    decoration: InputDecoration(
+                      labelText: 'Nova Tarefa',
+                      labelStyle: TextStyle(color: Colors.blueAccent),
+                    ),
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: () {},
+                  child: Text(
+                    'ADD',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blueAccent),
+                )
+              ]),
+            ),
+          ],
+        ));
   }
 
   Future<File> _getFile() async {
