@@ -24,6 +24,9 @@ class _HomeState extends State<Home> {
   //list of todos
   List _todoList = [];
 
+  Map<String, dynamic> _lastRemoved = Map();
+  int _lastRemovedPos = 0;
+
   @override
   void initState() {
     super.initState();
@@ -70,7 +73,7 @@ class _HomeState extends State<Home> {
               Expanded(
                 child: TextField(
                   controller: _todoController,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     labelText: 'Nova Tarefa',
                     labelStyle: TextStyle(color: Colors.blueAccent),
                   ),
@@ -92,7 +95,7 @@ class _HomeState extends State<Home> {
           ),
           Expanded(
             child: ListView.builder(
-                padding: EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.only(top: 10),
                 itemCount: _todoList.length,
                 itemBuilder: buildItem),
           )
@@ -101,12 +104,12 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget buildItem(contex, index) {
+  Widget buildItem(BuildContext contex, int index) {
     return Dismissible(
       key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
       background: Container(
         color: Colors.red,
-        child: Align(
+        child: const Align(
             alignment: Alignment(-0.9, 0.0),
             child: Icon(Icons.delete, color: Colors.white)),
       ),
@@ -130,6 +133,28 @@ class _HomeState extends State<Home> {
           });
         },
       ),
+      onDismissed: (direction) {
+        _lastRemoved = Map.from(_todoList[index]);
+        _lastRemovedPos = index;
+        _todoList.removeAt(index);
+
+        _saveData();
+
+        final snack = SnackBar(
+          duration: const Duration(seconds: 2),
+          content: Text("Tarefa \"${_lastRemoved["title"]}\" removida!"),
+          action: SnackBarAction(
+            label: "Desfazer",
+            onPressed: () {
+              setState(() {
+                _todoList.insert(_lastRemovedPos, _lastRemoved);
+                _saveData();
+              });
+            },
+          ),
+        );
+        ScaffoldMessenger.of(contex).showSnackBar(snack);
+      },
     );
   }
 
