@@ -40,6 +40,9 @@ class _HomeState extends State<Home> {
   void _addTodo() {
     setState(() {
       Map<String, dynamic> newTodo = Map();
+      if (_todoController.text.isEmpty) {
+        return;
+      }
       newTodo["title"] = _todoController.text;
       _todoController.text = "";
       newTodo["ok"] = false;
@@ -49,23 +52,18 @@ class _HomeState extends State<Home> {
     });
   }
 
-  void _removeTodo(int index) {
-    setState(() {
-      _todoList.removeAt(index);
-      _saveData();
-    });
-  }
-
   //função para esperar 1 segundo
   Future<Null> _refresh() async {
-    await Future.delayed(Duration(seconds: 1));
+    await Future.delayed(const Duration(seconds: 1));
     setState(() {
       _todoList.sort((a, b) {
-        if (a["ok"] && !b["ok"])
+        if (a["ok"] && !b["ok"]) {
           return 1;
-        else if (!a["ok"] && b["ok"])
+        } else if (!a["ok"] && b["ok"])
+          // ignore: curly_braces_in_flow_control_structures
           return -1;
         else
+          // ignore: curly_braces_in_flow_control_structures
           return 0;
       });
       _saveData();
@@ -99,7 +97,7 @@ class _HomeState extends State<Home> {
               ElevatedButton(
                 onPressed: () {
                   _addTodo();
-                  print("Adicionado");
+                  // print("Adicionado");
                 },
                 style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.blueAccent),
@@ -112,11 +110,11 @@ class _HomeState extends State<Home> {
           ),
           Expanded(
             child: RefreshIndicator(
+                onRefresh: _refresh,
                 child: ListView.builder(
                     padding: const EdgeInsets.only(top: 10),
                     itemCount: _todoList.length,
-                    itemBuilder: buildItem),
-                onRefresh: _refresh),
+                    itemBuilder: buildItem)),
           )
         ],
       ),
